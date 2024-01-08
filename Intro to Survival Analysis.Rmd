@@ -1,0 +1,55 @@
+---
+title: "Ex 3: Intro to Survival Analysis"
+author: "Raegan Gutierrez"
+date: "2023-02-26"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(survminer)
+library(survival)
+```
+
+## Question 1
+
+**You are studying three different new drugs that may help slow the progression of Alzheimer’s.  Do the following:**
+
+*a.	Draw a survival plot that shows the survival curves for all three drugs.*
+
+*b.	Test to see if overall there is an effect of any of the drugs on survival taken as a global set.*
+
+*c.	Compare the survival curves for each of the three drugs with each other (three comparisons) and see if any if the curves are different from each other.  *
+
+
+
+```{r}
+#Read in data 
+df2 = read.csv("alzheimers data.csv")
+```
+
+```{r}
+#part a: Survival Curve
+fit2 <- survfit(Surv(Time, Event)~Group, data = df2)
+
+ggsurvplot(fit2, df2)
+
+```
+
+```{r}
+#part b: LogRank test
+survdiff(Surv(Time, Event)~Group, data=df2)
+```
+
+The Log Rank test returned a p-value less than 0.05, meaning there is a significant difference between the groups. At least one of the drugs is different compared to the other two. 
+
+```{r}
+#part c: Pairwise LogRank test
+pairwise_survdiff(Surv(Time, Event)~Group, data=df2)
+```
+
+The difference between groups 1 and 2 is significant, and the difference between groups 2 and 3 is significant. There is no significant difference between group 1 and group 3. Based off of these results and our survival curve, we can conclude that the drug used in treatment group 2 is significantly better at slowing the progression of Alzheimer’s compared to the other two drugs used in groups 1 and 3. 
